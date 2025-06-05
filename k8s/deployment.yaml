@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gptwol-deployment
+  namespace: gptwol
+  labels:
+    app: gptwol
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gptwol
+  template:
+    metadata:
+      labels:
+        app: gptwol
+    spec:
+      hostNetwork: true # Wake-on-LANのためにホストネットワークを使用
+      dnsPolicy: ClusterFirstWithHostNet # hostNetwork使用時のDNSポリシー
+      containers:
+        - name: gptwol
+          image: misterbabou/gptwol:latest
+          env:
+            - name: PORT
+              value: "5000"
+            - name: TZ
+              value: "Asia/Tokyo"
+            #- name: SCRIPT_NAME
+            #  value: "/my-app"
+            #- name: DISABLE_ADD_DEL
+            #  value: "1"
+            #- name: DISABLE_REFRESH
+            #  value: "1"
+            #- name: REFRESH_INTERVAL
+            #  value: "15"
+            #- name: PING_TIMEOUT
+            #  value: "200"
+            #- name: TCP_TIMEOUT
+            #  value: "5"
+          ports:
+            - containerPort: 5000
+              hostPort: 5000 # hostNetworkがtrueの場合、このポートはホスト上で開かれます
+              name: http
+          volumeMounts:
+            - name: computers-volume
+              mountPath: "/app/db/computers.txt"
+              subPath: computers.txt # ConfigMap内のファイル名を指定
+      volumes:
+        - name: computers-volume
+          configMap:
+            name: gptwol-computers
