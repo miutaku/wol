@@ -17,6 +17,7 @@ $ docker compose up -d
 ## deploy
 
 ```shell
+$ cd k8s
 $ kubectl apply -f namespace.yaml
 namespace/gptwol created
 
