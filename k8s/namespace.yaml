@@ -1,0 +1,9 @@
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: gptwol
+  labels:
+    name: gptwol
+    app: gptwol
+
