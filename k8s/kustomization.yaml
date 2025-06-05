@@ -1,7 +1,7 @@
 ---
 configMapGenerator:
   - name: gptwol-computers
-    namespace: gptwol
+    namespace: app-gptwol
     files:
       - computers.txt=../appdata/db/computers.txt
 resources:

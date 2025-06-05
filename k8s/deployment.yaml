@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gptwol-deployment
-  namespace: gptwol
+  namespace: app-gptwol
   labels:
     app: gptwol
 spec:

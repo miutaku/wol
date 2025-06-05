@@ -2,7 +2,7 @@
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: gptwol
+  name: app-gptwol
   labels:
     name: gptwol
     app: gptwol
