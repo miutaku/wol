@@ -1,0 +1,43 @@
+---
+name: Deploy to k8s
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'appdata/db/computers.txt'
+      - 'k8s/**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  deploy:
+    name: Auto Deploy via ssh
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      - name: Set up kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      - name: Apply Kubernetes manifests
+        working-directory: k8s
+        run: |
+          kubectl apply -f namespace.yaml
+          kubectl kustomize --load-restrictor LoadRestrictionsNone | kubectl apply -f -
