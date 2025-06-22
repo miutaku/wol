@@ -7,9 +7,11 @@ metadata:
 spec:
   selector:
     app: gptwol
-  type: NodePort
+  type: LoadBalancer
+  loadBalancerIP: 192.168.0.200
   ports:
-    - protocol: TCP
-      port: 5000 # Serviceのポート
-      targetPort: 5000 # Podのポート
-      nodePort: 30000 # NodePortのポート
+    - name: gptwol-app
+      protocol: TCP
+      port: 5000
+      targetPort: 5000
+      nodePort: 30000
