@@ -16,7 +16,7 @@ spec:
       labels:
         app: gptwol
     spec:
-      hostNetwork: false
+      hostNetwork: true # magic packetを送信するためにホストネットワークを使用
       dnsPolicy: ClusterFirstWithHostNet # hostNetwork使用時のDNSポリシー
       containers:
         - name: gptwol
