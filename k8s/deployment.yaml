@@ -7,7 +7,7 @@ metadata:
   labels:
     app: gptwol
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: gptwol
@@ -16,8 +16,17 @@ spec:
       labels:
         app: gptwol
     spec:
-      hostNetwork: true # magic packetを送信するためにホストネットワークを使用
-      dnsPolicy: ClusterFirstWithHostNet # hostNetwork使用時のDNSポリシー
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      initContainers:
+        - name: copy-computers-txt
+          image: busybox
+          command: ['sh', '-c', 'cp /config/computers.txt /db/computers.txt']
+          volumeMounts:
+            - name: computers-config-volume
+              mountPath: /config
+            - name: db-volume
+              mountPath: /db
       containers:
         - name: gptwol
           image: misterbabou/gptwol:latest
@@ -26,27 +35,15 @@ spec:
               value: "5000"
             - name: TZ
               value: "Asia/Tokyo"
-            #- name: SCRIPT_NAME
-            #  value: "/my-app"
-            #- name: DISABLE_ADD_DEL
-            #  value: "1"
-            #- name: DISABLE_REFRESH
-            #  value: "1"
-            #- name: REFRESH_INTERVAL
-            #  value: "15"
-            #- name: PING_TIMEOUT
-            #  value: "200"
-            #- name: TCP_TIMEOUT
-            #  value: "5"
           ports:
             - containerPort: 5000
-              #hostPort: 5000 # hostNetworkがtrueの場合、このポートはホスト上で開かれます
               name: http
           volumeMounts:
-            - name: computers-volume
-              mountPath: "/app/db/computers.txt"
-              subPath: computers.txt # ConfigMap内のファイル名を指定
+            - name: db-volume
+              mountPath: "/app/db"
       volumes:
-        - name: computers-volume
+        - name: computers-config-volume
           configMap:
             name: gptwol-computers
+        - name: db-volume
+          emptyDir: {}
